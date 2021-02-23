@@ -1,0 +1,110 @@
+rpm -qa | grep java
+列出所有被安装得 java包（管道命令过滤  -q查询一个包是否被安装 -qa表示 所有）
+
+1.在user目录下新建java文件夹
+2.# wget http://download.oracle.com/otn-pub/java/jdk/8u181-b13/96a7b8442fe848ef90c96a2fad6ed6d1/jdk-8u181-linux-x64.tar.gz?AuthParam=1534129356_6b3ac55c6a38ba5a54c912855deb6a22
+3.解压：使用tar -zxvf 文件名进行解压
+4.vi /etc/profile
+#java
+export JAVA_HOME=/usr/java/jdk1.8.0_181
+export PATH=$JAVA_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib
+
+搜索java安装包过滤查找jdk
+1.yum search java|grep jdk
+安装jdk1.8
+2.yum install java-1.8.0-openjdk
+配置环境变量
+3.vi /etc/profile
+. /etc/profile  使配置生效
+
+安装tomcat
+1.下载tomcat tar.gz
+2.解压
+  tar -zxv -f apache-tomcat-8.5.37.tar.gz
+  (对应压缩命令 tar -zcx -f 压缩文件名.tar.gz)
+  重命名
+  mv apache-tomcat-8.5.37 tomcat8
+  cd tomcat
+3.启动tomcat
+  /usr/local/tomcat/tomcat8/bin/startup.sh
+4.输入ip:8080如果能访问成功，不能访问需要配置防火墙开放8080
+  centos7之后使用firewall管理防火墙
+  查看
+  firewall-cmd --state  查看防火墙状态
+  ##添加端口8080为允许
+  firewall-cmd --zone=public --add-port=8080/tcp --permanent
+  (--zone指定区域，--permanent 没有此参数重启后失效)
+  ##查看
+  firewall-cmd --zone=public --query-port=8080/tcp
+  ##删除端口开放
+  firewall-cmd --zone=public --remove-port=8080/tcp --permanent
+  ##重新加载防火墙
+  firewall-cmd --reload  
+
+腾讯云
+111.231.6.253  22
+root:Luchang@2020
+
+
+nohup java -jar airquality-admin-api-1.0.jar > admin.out &
+nohup java -jar airquality-wx-api-1.0.jar > wx.out &
+
+sftp连接服务器进行上传下载
+sftp -oPort=22 root@111.231.6.253
+put
+get
+
+
+ps -ef | grep tomcat
+netstat -nap | grep 17957
+
+redis systemctl启动
+https://www.cnblogs.com/mr-wuxiansheng/p/12494124.html
+
+chmod 777 /etc/redis/redis.conf
+systemctl start redis.service
+
+systemctl restart redis
+systemctl enable redis  开机自启动
+systemctl disable redis 禁止开机启动
+ps -ef | grep redis  / ps -aux | grep redis    查看redis服务进程/查看Redis是否启动
+netstat -tunple | grep 6379    查看redis服务进程/查看Redis是否启动
+
+
+
+启动
+nohup java -Xms128m -Xmx256m -XX:PermSize=128M -XX:MaxPermSize=256M -jar sundear-scheduler-1.0.jar > sundear-scheduler.out &
+nohup java -Xms128m -Xmx256m -XX:PermSize=128M -XX:MaxPermSize=256M -jar sundear-document-1.0.jar > sundear-document.out &
+
+#启动redis
+systemctl start redis.service
+#启动nginx
+nginx
+#重启 nginx
+nginx -s reload
+查看端口有没有占用
+lsof -i:port
+
+服务器列表
+202.102.72.31:55522 
+root 
+Sundear-No..1
+
+nohup java -Xms128m -Xmx256m -jar airquality-admin-api-1.0.jar > admin.out &
+nohup java -Xms128m -Xmx256m -jar airquality-wx-api-1.0.jar > wx.out &
+
+
+122.112.180.184 55522
+root 
+Sundear-No..1
+
+
+tail -500f /usr/local/project/logs/document-server/app.log
+
+
+1.查看包是否安装
+rpm -q [包名]
+
+2.将一台linux文件目录挂载到另一台
+yum install -y nfs-utils

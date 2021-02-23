@@ -1,0 +1,49 @@
+-------------1-----------------
+#!/bin/bash
+read -p "请输入一个整数:" n
+sum=0
+for ((i=1;i<= $n;i++)); do
+sum=$[$sum+$i]
+done
+echo "从1加到您输入的整数和为$sum"
+--------------2------------------
+#!/bin/bash
+lisoftest3=(` ls `)
+echo ${lisoftest3[@]}
+a=${#lisoftest3[@]}
+echo "数组长度为:$a"
+for ((i=0;i< $a;i++)); do
+if [ -d /home/luchang/test3/${lisoftest3[ $i ]} ]; then
+echo "将${lisoftest3[ $i ]} 复制到根目录下的test0中"
+`cp -r ~/test3/${lisoftest3[ $i ]}  ~/test0`
+else
+echo "${lisoftest3[ $i ]} 不是目录!"
+fi
+done
+--------------3-------------------
+#!/bin/bash
+#check方法
+function checkip() {
+	if echo $1 | egrep -q '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'; then
+		a=`echo $1 | awk -F . '{print $1}'`
+		b=`echo $1 | awk -F . '{print $2}'`
+		c=`echo $1 | awk -F . '{print $3}'`
+		d=`echo $1 | awk -F . '{print $4}'`
+		for n in $a $b $c $d; do
+			if [ $n -ge 255 ] || [ $n -le 0 ]; then
+				echo "IP不合法,字段应该在1-254之间"
+				return 2
+			fi
+		done
+	else
+		echo "您输入的IP地址不合法!例如192.168.1.1"
+		return 1
+	fi
+}
+rs=1
+while [ $rs -gt 0 ]; do
+	read -p "请输入IP:" ip
+	checkip $ip
+	rs=`echo $?` #return的值重新赋给rs
+done
+echo "您的IP合法"

@@ -1,0 +1,30 @@
+vue；https://panjiachen.github.io/vue-element-admin-site/zh/guide/#功能
+
+开源视频会议app：https://github.com/jitsi/jitsi-meet
+
+集成activiti：https://github.com/fengli01/bpmn-spring-boot.git
+
+代码生成：https://java.bejson.com/generator/
+
+包装数据类型和基本数据类型使用规则：https://www.cnblogs.com/ooo0/p/12779437.html
+
+设计模式：需要自己学习
+
+maven私服搭建：Sonatype Nexus
+
+java爬虫框架：WebMagic（http://webmagic.io/docs/zh/） 、Nutch（apache）、WebController、Jvppeteer（https://github.com/fanyong920/jvppeteer）
+
+异步刷新缓存
+
+
+//链路追踪服务端启动
+java -jar zipkin-server.jar --server.port=8402 --zipkin.storage.type=mysql --zipkin.storage.mysql.db=cloud_base --zipkin.storage.mysql.username=root --zipkin.storage.mysql.password=luc --zipkin.storage.mysql.host=localhost --zipkin.storage.mysql.port=3306 --zipkin.collector.rabbitmq.addresses=localhost:5672 --zipkin.collector.rabbitmq.username=guest --zipkin.collector.rabbitmq.password=guest
+//rabbitmq增加vhost
+java -jar zipkin-server.jar --server.port=8402 --zipkin.storage.type=mysql --zipkin.storage.mysql.db=cloud_base --zipkin.storage.mysql.username=root --zipkin.storage.mysql.password=luc --zipkin.storage.mysql.host=localhost --zipkin.storage.mysql.port=3306 --zipkin.collector.rabbitmq.addresses=localhost:5672 --zipkin.collector.rabbitmq.username=admin --zipkin.collector.rabbitmq.password=admin --zipkin.collector.rabbitmq.vhost=anzhibu
+
+
+
+
+1685581327107132---
+
+[{"dpa_template":0,"derive_poster_cid":0,"image_ids":["web.business.image/202012095d0de7c3bec610e84ffba0cb"],"image_mode":"CREATIVE_IMAGE_MODE_LARGE","title":"你好啊啊啊啊啊啊啊 啊啊","creative_id":1685591275784196},{"dpa_template":0,"derive_poster_cid":0,"image_ids":["web.business.image/202012095d0da77f49ce5fb14f63859c","web.business.image/202012095d0d9713e95ae6754a539487","web.business.image/202012095d0d3f6220f699b9410c8a35"],"image_mode":"CREATIVE_IMAGE_MODE_GROUP","title":"你好啊啊啊啊啊啊啊 啊啊","creative_id":1685591275784244}]

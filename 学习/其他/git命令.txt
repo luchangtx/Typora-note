@@ -1,0 +1,68 @@
+————————————————————————————第一次提交代码到git———————————————————————————————————
+初始化本地仓库
+git init
+添加远程仓库到本地
+git remote add origin http://
+将远程仓库代码拉取到本地
+git pull origin xxx
+git pull --rebase origin xxx  拉取合并冲突
+
+
+luchangtx2015@163.com
+sen9674ydqc513
+
+将文件保存到缓冲区
+git add .
+提交代码
+git commit -m "xxx"
+推送
+git push origin xxx
+————————————————————————————git建好分支上传代码———————————————————————————————————
+创建分支： git branch xxx
+切换分支： git checkout xxx
+创建并切换分支： git checkout -b xxx
+
+如果是提交代码到新建的分支
+使用git branch -a看不到该远程分支，直接使用命令git checkout test报错如下：
+error: pathspec 'origin/test' did not match any file(s) known to git.
+此时需要使用 git fetch 取回所有分支的更新
+执行 git branch -a 就可以看到所有分支了
+然后切换分支提交代码
+————————————————————————————从git拉取分支———————————————————————————————————
+1.本地新建文件工作空间git bash here
+2.git init 初始化
+3.于远程建立连接
+  git remote add origin https://github.com/luchangtx/luc.git
+4.获取远程分支 git fetch origin dev
+5.在本地创建分支并切换到该分支,并于远程分支连接
+  git checkout -b dev origin/dev
+6.将远程分支内容拉取到本地
+  git pull origin dev
+
+——————————————————————创建分支，并将代码提交到新建分支——————————————————————
+1、git init
+2、git add *
+3、git commit -m "test" 
+4、（创建分支）
+  git branch test
+5、（切换分支）
+  git checkout test
+6、与远程分支相关联
+  git remote add origin http://git.sundear.com:808/lm-ad/sundear-dispatch.git
+7、（将分支上传）
+  git push origin test
+
+
+
+
+1、git init
+2、git add *
+3、git commit -m "test" 
+4、（创建分支）
+  git branch test
+5、（切换分支）
+  git checkout test
+6、与远程分支相关联
+  git remote add origin http://xxxx.git
+7、（将分支上传）
+  git push origin test

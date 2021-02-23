@@ -1,0 +1,133 @@
+1、在虚拟机中安装CentOS
+（1）填写名称centos-1，选择存放的文件夹，类型选“linux”，版本选“Red Hat（64-bit）”
+（2）内存按硬件资源自定义，一般1024M
+（3）选择“现在创建虚拟硬盘”
+（4）选择“VHD（虚拟硬盘）”
+（5）选择“动态分配”
+（6）默认
+（7）创建
+（8）设置虚拟机网卡：选择创建好的虚拟机，点击“设置”按钮，在网络一栏中，连接方式中，选择“桥接网卡”。
+（9）启动
+（10）选择启动盘
+（11）安装虚拟机中的CentOS 7操作系统。安装过程中有红色文字的需要设置。
+
+（6）配置网络
+
+vi /etc/sysconfig/network-scripts/ifcfg-ens33
+配置文件内容如下：
+TYPE=Ethernet                # 网卡类型：为以太网
+PROXY_METHOD=none            # 代理方式：关闭状态
+BROWSER_ONLY=no                # 只是浏览器：否
+BOOTPROTO=static                # 网卡的引导协议：DHCP[中文名称: 动态主机配置协议]
+DEFROUTE=yes                # 默认路由：是, 不明白的可以百度关键词 `默认路由`
+IPV4_FAILURE_FATAL=no        # 是不开启IPV4致命错误检测：否
+IPV6INIT=yes                # IPV6是否自动初始化: 是[不会有任何影响, 现在还没用到IPV6]
+IPV6_AUTOCONF=yes            # IPV6是否自动配置：是[不会有任何影响, 现在还没用到IPV6]
+IPV6_DEFROUTE=yes            # IPV6是否可以为默认路由：是[不会有任何影响, 现在还没用到IPV6]
+IPV6_FAILURE_FATAL=no        # 是不开启IPV6致命错误检测：否
+IPV6_ADDR_GEN_MODE=stable-privacy            # IPV6地址生成模型：stable-privacy [这只一种生成IPV6的策略]
+NAME=ens33                    # 网卡物理设备名称
+UUID=f47bde51-fa78-4f79-b68f-d5dd90cfc698    # 通用唯一识别码, 每一个网卡都会有, 不能重复, 否两台linux只有一台网卡可用
+DEVICE=ens33                    # 网卡设备名称, 必须和 `NAME` 值一样
+ONBOOT=yes                        # 是否开机启动， 要想网卡开机就启动或通过 `systemctl restart network`控制网卡,必须设置为 `yes`
+IPADDR=192.168.31.102
+NETMASK=255.255.255.0
+GATEWAY=192.168.31.1
+
+配置DNS
+vi /etc/resolv.conf
+search localdomain
+nameserver 8.8.8.8
+
+保存配置文件，并运行以下命令
+service network restart
+
+（7）设置主机名
+查看hostnmae
+[root@centos ~]$ hostname    
+修改hostname
+[root@localhost ~]$ hostnamectl set-hostname centos-1  # 使用这个命令会立即生效且重启也生效
+
+（8）配置hosts
+
+vi /etc/hosts
+配置本机的hostname到ip地址的映射
+192.168.31.101 centos-1
+
+（9）配置winscp和putty等连接服务器工具
+
+（10）关闭防火墙
+systemctl stop firewalld.service  
+systemctl disable firewalld.service
+
+临时关闭selinux
+sudo setenforce 0
+永久关闭selinux
+vi /etc/selinux/config
+SELINUX=disabled
+
+重启虚拟机
+reboot
+
+（11）配置yum
+
+yum clean all
+yum makecache
+yum install wget
+
+------------------------------------------------------------------------------------------
+
+2、在每个CentOS中都安装Java和Perl
+
+（1）安装JDK
+
+yum install java-1.8.0-openjdk* -y
+测试jdk安装是否成功：
+java -version
+
+（2）安装Perl
+yum install -y gcc
+yum install -y perl
+perl -v
+
+3、在4个虚拟机中安装CentOS集群
+
+（1）按照上述步骤，再安装三台一模一样环境的linux机器
+（2）另外三台机器的hostname分别设置为centos-2，centos-3，centos-4
+（3）安装好之后，在每台机器的hosts文件里面，配置好所有的机器的ip地址到hostname的映射关系
+
+比如说，在centos-1的hosts里面
+
+192.168.31.101 centos-1
+192.168.31.102 centos-2
+192.168.31.103 centos-3
+192.168.31.104 centos-4
+
+------------------------------------------------------------------------------------------
+
+4、配置4台CentOS为ssh免密码互相通信
+
+（1）首先在三台机器上配置对本机的ssh免密码登录
+ssh-keygen -t rsa
+生成本机的公钥，过程中不断敲回车即可，ssh-keygen命令默认会将公钥放在/root/.ssh目录下
+cd /root/.ssh
+cp id_rsa.pub authorized_keys
+将公钥复制为authorized_keys文件，此时使用ssh连接本机就不需要输入密码了
+
+（2）接着配置三台机器互相之间的ssh免密码登录
+使用ssh-copy-id -i hostname命令将本机的公钥拷贝到指定机器的authorized_keys文件中
+
+------------------------------------------------------------------------------------------
+5、redis的安装
+（1）安装本地版的redis
+没有安装源的话先安装epel源
+yum install -y epel-release
+yum install -y redis
+修改redis.conf中的部分配置为生产环境
+daemonize	yes
+启动redis
+systemctl start redis.service
+确认redis进程是否启动
+ps -ef | grep redis
+让redis跟随系统启动自动启动
+chkconfig redis on

@@ -1,0 +1,35 @@
+不仅install到target也会install到本地
+mvn clean install -pl 模块名 -am
+
+仅install到target目录
+mvn clean package -pl 模块名 -am
+
+
+mvn clean package：依次执行了clean、resources、compile、testResources、testCompile、test、jar(打包)等７个阶段。
+mvn clean install：依次执行了clean、resources、compile、testResources、testCompile、test、jar(打包)、install等8个阶段。
+mvn clean deploy：依次执行了clean、resources、compile、testResources、testCompile、test、jar(打包)、install、deploy等９个阶段。
+
+由上面的分析可知主要区别如下，
+
+package：命令完成了项目编译、单元测试、打包功能，但没有把打好的可执行jar包（war包或其它形式的包）布署到本地maven仓库和远程maven私服仓库
+install：命令完成了项目编译、单元测试、打包功能，同时把打好的可执行jar包（war包或其它形式的包）布署到本地maven仓库，但没有布署到远程maven私服仓库
+deploy：命令完成了项目编译、单元测试、打包功能，同时把打好的可执行jar包（war包或其它形式的包）布署到本地maven仓库和远程maven私服仓库
+
+
+发布jar包到私服
+--开发版，id与settings.xml配置的一致
+mvn deploy:deploy-file -DgroupId=com.sundear.scheduler -DartifactId=sundear-scheduler -Dversion=1.0 -Dpackaging=jar -Dfile=F:\sundear\luoma\sundear-dispatch\sundear-scheduler\target\sundear-scheduler-1.0.jar -Durl=http://122.112.180.184:8081/repository/maven-snapshots/ -DrepositoryId=snapshots
+--稳定版，id与settings.xml配置的一致
+mvn deploy:deploy-file -DgroupId=com.sundear.scheduler -DartifactId=sundear-scheduler -Dversion=1.0 -Dpackaging=jar -Dfile=F:\sundear\luoma\sundear-dispatch\sundear-scheduler\target\sundear-scheduler-1.0.jar -Durl=http://122.112.180.184:8081/repository/maven-releases/ -DrepositoryId=releases
+
+
+mvn deploy:deploy-file -DgroupId=com.sundear.document -DartifactId=sundear-document -Dversion=1.0 -Dpackaging=jar -Dfile=F:\sundear\luoma\sundear-common-service\sundear-document\target\sundear-document-1.0.jar -Durl=http://122.112.180.184:8081/repository/maven-releases/ -DrepositoryId=releases
+
+私服账号密码
+<username>admin</username>
+<password>sundear@2020</password>
+
+F:\sundear\luoma\sundear-dispatch\sundear-scheduler-api\target\sundear-scheduler-api-0.0.1-SNAPSHOT.jar
+
+
+mvn deploy:deploy-file -DgroupId=com.sundear.schedulerapi -DartifactId=sundear-scheduler-api -Dversion=0.0.1-SNAPSHOT -Dpackaging=jar -Dfile=F:\sundear\luoma\sundear-dispatch\sundear-scheduler-api\target\sundear-scheduler-api-0.0.1-SNAPSHOT.jar -Durl=http://122.112.180.184:8081/repository/maven-snapshots/ -DrepositoryId=snapshots

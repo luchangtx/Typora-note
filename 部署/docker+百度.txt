@@ -1,0 +1,40 @@
+# 安装docker
+yum install docker
+# 查看docker版本
+docker version
+# 启动docker服务
+systemctl start docker.service
+# 开机启动docker
+systemctl enable docker.service
+
+https://repo.mysql.com/mysql57-community-release-el7-10.noarch.rpm
+
+1) Realtek PCIe GBE Family Controller
+2) Microsoft Wi-Fi Direct Virtual Adapter #2
+
+
+host：sem.baidubce.com
+
+
+bce-auth-v2/{accessKeyId}/{date}/{region}/{service}/{signedHeaders}/{signature}
+
+accessKeyId: 71c0ccf3d28b4ad9936c8f9a50212d87 
+date: 20201029
+region: fsh
+service: /v1feed/cloud/AccountFeedService/getAccountFeed
+signedHeaders: host;range;x-bce-date
+
+secretAccessKey: bc268651a8784b60adb7727e8dabe726 
+
+"POST\n"+CanonicalURI+"\n"+CanonicalQueryString +"\n"+CanonicalHeaders
+
+
+"POST\n/v1/feed/cloud/CampaignFeedService/getCampaignFeed\n\n"+"sem.baidubce.com"
+
+
+signingKey：8e72cd73f5d77ce939a83a125a55a0b0d977ae81b106780d149942682f99c4c0
+signature: 87bf5938dda40244f5d3f3c79bb096a54ee5cdab32a994548ee58350c7365fb0
+
+
+!luoma2020
+

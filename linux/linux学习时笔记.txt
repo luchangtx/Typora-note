@@ -1,0 +1,803 @@
+Linux
+linux-IP: 192.168.149.128
+
+1-Win7启动
+    1)按下电源
+    2)BIOS自检（Intel vt-x）
+    3)硬盘启动,加载MBR(主引导记录)
+    4)加载分区,找到bootmgr
+    5)选择需要启动的操作系统
+    6)运行WIN7的winload.exe
+    7)加载WIN7内核(C盘的文件、启动项)
+2-Linux启动
+    1)按下电源
+    2)BIOS自检（Intel vt-x）
+    3)硬盘启动,加载/boot目录下的内核
+    4)init进程(所有进程的主进程-启动项进程)
+    5)加载启动项(守护进程)
+    6)判断运行的级别(7个级别)
+    7)系统初始化--相当于win7第6部
+    8)建立终端(系统启动好了,可以使用图形界面、命令行、SSH(PUTTY)登录)
+
+a-服务器
+b-域名
+c-网络
+
+命令
+ls/ 列出所有系统根目录
+
+ls 相当于 ls~ 列出用户所有文件夹
+
+ls -al：列出所有的文件和文件夹的详细信息（包含隐藏文件,隐藏文件以·开头）
+ls -l：列出所有文件和文件夹的详细信息（不包含隐藏文件）
+ls -a：列出目录，包含隐藏的信息
+ls -s：列出文件夹占用的空间
+ls -s -s：按照占用空间排序文件夹
+ls -lh：文件的大小
+cd后只能跟文件夹
+cd /etc/ 进入根目录下的etc文件夹
+pwd 查看当前所在的文件夹路径
+test3
+	test5
+	test4
+		test6
+			test61
+	test7
+	test8
+test4
+	test4
+	test5
+	test6
+
+cd ../../test3/test4/test6
+cd ../../../test4/test5
+
+目前位置处于test/test5文件夹下:
+
+cd ~/test4 进入用户根目录下的test4
+
+cd ~test3/test4 进入用户根目录下面test3文件夹下的test4文件夹
+cd ../ 返回上一层
+cd ./ 返回当前目录
+cd ../test4 返回上一层的test4
+cd /test4 返回系统根目录下的test4
+/test3/test4 绝对路径===C:\test3\test4
+../test4 相对路径===../test4
+
+文件夹命令
+创建文件夹
+mkdir test61 创建文件夹test61
+删除文件夹
+rmdir test61 删除文件夹test61
+复制文件夹
+
+cp -r ~/test3/test5 . 
+将/test3/test5目录下的最后一级文件夹test5全部拷贝到当前路径下
+cp -r ~/test4  ~/test3/test4/test6 （拷贝目录）
+将test4文件夹下面所有的文件和文件夹递归拷贝到test3/test4/test6文件夹下
+删除文件夹
+rm -r test61 删除test61下面所有的文件文件夹
+rmdir test61 仅仅删除空白目录（空白文件夹）
+移动文件夹
+mv test61 test62 把61剪切到62，如果test62不存在，则相当于把test61重命名为test62
+
+文件命令
+查看文件内容
+cat test9 查看test9文件内容
+cp test9 test10 复制test9里面的内容到test10，若test10已存在，则覆盖
+cat test9 test10 查看test9、test10文件内容
+vi test10 修改test10 i+Esc+:wq 回车保存
+cp -f 复制文件
+删除文件
+rm j.txt
+tac j.txt 查看j.txt，倒置显示
+more j.txt 一页一页显示
+less j.txt 一页一页显示，不想看了 输入q退出，less比more快
+head -n 2 j.txt 显示前两行
+tail -n 2 j.txt 显示最后两行
+
+通配符
+* 匹配0个或者多个
+? 匹配一个
+[] 匹配一组
+ls test* 列出所有以test开头的文件和文件夹
+ls test*.* 查看所有以test开头，任意后缀的文件
+ls james*.?? 查看以james开头的后缀是两个字符的文件
+ls test[678] 查看所有以test开头,包含一个6、一个7、或者一个8的文件
+
+
+2-文件系统
+第一级'/'根目录===‘我的电脑’,对于普通用户而言，~代表home[luchang@localhost ~]$
+
+第二级：没有盘符的概念===D、E、盘
+    root、
+    bin(存放经常需要使用的命令)、boot(存放启动系统的时候的内核文件)、
+    dev(Device设备,访问设备的内容,在Linux中访问硬件外设就像访问文件一样)、
+    etc(存放系统管理的配置文件)、var(放置一些日志文件)
+    home(用户的主目录)、lib(存放动态链接库)、
+    lib64、usr(用户的程序文件===programfiles)、media(外设设备:光盘...)......
+    usr/bin(用户安装的程序)、usr/sbin(超级用户安装的程序和守护进程)
+3-用户类型：
+  1-系统管理员：root拥有所有权限
+  2-文件所有者：创建文件的人
+  3-组所有者：组用户
+  4-其他用户：组之外的用户
+
+4-给文件授权
+r=4
+w=2
+x=1
+test6授权 rw-rw-rw
+创建者 rwx =7
+组 r-- =4
+其他用户 --- =0
+chmod 740 test6
+
+不给其他用户执行权限
+chmod o-x test7
+
+	 u(user:创建者)	        +(新增权限)	
+chmod	 g(group:组)	        -(去除权限)	Test7
+	 o(others：其他用户)	=(赋予权限)	
+	 a(all:所有用户)		
+
+chmod		u+x		test7 # 创建者用户新增一个执行权限
+chmod		o-w		test7 # 其他用户删除掉写入权限
+chmod           a-x		test7 # 所有的用户都不给与执行权限
+
+
+
+VI文件
+vim编辑器：用于创建、编辑文档的可视化编辑器
+新建文件
+vi test1.txt 新建文件
+
+vi的三种工作模式
+1)命令模式:一般不用于录入文档内容，用于执行命令,输入i,工作模式变为输入模式
+2)输入模式:--INSERT--显示在屏幕左下方
+3)退出模式:退出命令esc退出输入模式;使用:调用退出模式
+	:w表示保存文件  :wq保存文件并推出  :q!表示不保存直接退出
+
+
+用户管理
+
+1)新增用户
+  useradd -d /usr/sam -m sam
+新增sam用户，在usr文件夹下创建一个sam用户主目录
+useradd -g niit user115
+在组niit中，新建用户user115
+查看用户是否创建成功
+用户创建的信息在/etc/passwd文件中
+tail -3 /etc/passwd
+
+user115:x:1003:1002::/home/user115:/bin/bash
+:分割、user115创建出来的用户名
+x本来用于放置用户密码,x为代替字符
+1003 用户ID、1002 所在组ID、1002后的空格 注释说明
+/home/user115 用户home目录
+/bin/bash 用户登录后启动的程序
+
+2)删除用户
+userdel user1153
+删除sam用户，还删除sam相关的一些文件(/etc/passwd,/etc/shadow,/etc/group)
+同时也删除sam的主目录
+查看是否删除成功？
+su user1153、tail -5/etc/passwd
+
+用户信息放在etc/passwd里面
+3)查看一个组里的用户
+grep 1002 /etc/passwd
+A.获取james组的id
+(grep james /etc/group
+ tail -n5 /etc/group)
+B.根据james的id搜索用户
+grep 1000 /etc/passwd
+4)修改密码
+修改自己的密码
+passwd
+修改别人密码
+pssswd    user115
+删除密码（登录不要询问密码）
+passwd   -d  user115
+
+锁定用户(用户没有被删除，只是被锁定，就不能登录了)
+passwd   -l   user115
+
+
+用户组管理
+1)groupadd niit 新建用户组，组名为niit
+使用一下命令查看是否创建成功
+tail -n1 /etc/group
+niit:x:1002:
+:代表分隔符
+niit组名
+x替代符号
+1002代表组id，root=0；1-499：系统保留ID
+
+2)删除组
+groupdel   niit #删除一个用户组
+#假如一个用户组中包含了用户，则只有删除用户后才可以删除改组
+
+#组信息放在/etc/group
+
+
+1-标准的输入(键盘)
+cat
+等待用户输入，退出录入 ctrl+d或者ctrl+z
+vi也算
+
+2-标准的输出(屏幕显示)
+ls 
+
+重定向
+输入重定向
+cat < j.txt 将j.txt文件重定向输入到屏幕上显示
+即使用j.txt代替标准的键盘输入
+cat 0< j.txt	cat j.txt
+输出重定向
+cat j.txt > j_out.txt
+将j.txt内容输出到j_out.txt文件中去(类似于复制)
+如果j_out.txt已存在,则将会被覆盖
+cat j.txt >> j_out.txt,不会覆盖,而是追加在后面
+
+
+过滤器
+1-grep过滤器
+grep 'james' /etc/passwd
+在/etc/passwd文件中搜索james
+-n 输出符合要求的行，同时也打出行数
+grep -n 'james' /etc/passwd
+-i 忽略大小写
+grep -i 'jAmEs' /etc/passwd
+-c 打印符合要求的行数
+grep -c 'james' /etc/passwd
+-v 打印不符合要求的行数
+grep -v 'james' /etc/passwd
+-A1、-A2... 查看结果和下面的1、2行
+-B1 查看结果和上面的1行
+-C2 查看结果和上下各2行
+
+正则字符	示例			描述
+[]		grep jam[abc]		jama、jamb、jamc
+[a-z]		grep jam[a-c]		jama、jamb、jamc
+^		grep ^jam[a-c]		以jama、jamb、jamc开头的
+[^]		grep jam[^a-c]		查找jam后面除了a-c之外的任意字符
+$		grep jam[a-c]$		以jama、jamb、jamc为结尾的
+.		grep jam.[a-c]		jam后面接a、b、c任意一个字符
+
+2-wc过滤器
+用于计算文件或者标准输入的行数、词数、字符数
+wc j.txt 39 126 557
+三个数字分别代表 行数、词数、字符数
+
+3-cut过滤器
+从命令中抽取特定列
+cut -d ':' -f1 /etc/passwd 查出文件中所有的用户名
+-d 间隔符号是什么
+-f 显示指定列
+
+cut -c
+-c 显示指定的字符
+
+4-tr过滤器
+将一组字符翻译成另外一组
+tr -s " " < whotemp 将很多个空格变为一个空格
+-s 将几个字符替换成为一个
+tr "[a-z]" "[A-Z]" 用大写代替小写
+tr ':' " " < /etc/passwd 将:转为空格
+
+5-sort
+sort 升序显示
+sort -r 降序显示
+
+管道
+ls | more 将ls和more命令合并起来一起显示
+| 称为管道
+找出所有以"-rw"开头的文件信息,将查处来的结果空格替换为:,再查询这些文件的所有者
+ls -l | grep '^-rw' | tr " " ":" | cut -d ":" -f3,5,10|sort -n -k2 -t
+
+显示出下一个目录下的文件数
+ls | wc -l
+
+作业 找出所有以"-rw"开头的文件信息,将查处来的结果空格替换为:
+再查询这些文件的所有者、文件名、文件大小，并以文件大小升序排列
+ls -l | grep '^-rw' | tr " " ":" | cut -d ":"  -f3，5,10 | sort -n -k2 -t:
+
+显示出一个目录下的文件数：
+ls    |     wc    -l
+
+
+shell
+shell:操作系统(内核)和硬件交互的中间介质
+内核==大脑
+硬件==四肢
+shell==五官
+
+写法:
+#!是shell的开头,后面指定了shell的版本
+#!/bin/bash
+echo "hello hapi"
+写好后一般保存为:xx.sh
+运行:
+./xx.sh 运行当前目录下的xx.sh
+xx.sh 在系统环境变量path的路径(/bin、/sbin)下运行
+
+/ 根目录
+./ 当前目录
+../ 上级目录
+
+1-变量
+
+修改权限--chmod u+x *.sh
+
+comname="niit" 注意没有分号,=左右没有空格
+变量名命名规则:
+1）首字符必须是字母
+2）变量名中间不能有空格,可以有下划线
+3）不能使用标点符号
+4）不能使用bash关键字
+使用变量：echo $somname
+comname='james'正确
+comname="james'scat"正确
+comname='james'scat'错误
+comname=`pwd` 如果变量需要用到命令,则使用反引号,tab键上面那个键
+
+注意:父shell中的变量进入子shell后不会有效
+如果要生效,则父级用到export comname命令
+bash进入下一级、exit返回上一级
+
+comname="james"
+echo ${comname:1:2} am 字符串提取(下标从0开始)
+echo ${#comname} 提取字符串长度
+
+
+echo "我正在使用的目录是:/luchang/test3"
+comname="niit"
+readonly comname
+comname="world" 错误,因为变量设置只读,不可以再赋值
+
+删除变量
+unset comname
+
+数组
+comnames=(niit sun ms oracle)
+echo ${comnames[@]}读取所有的元素
+echo ${#comnames[@]}统计数组元素个数
+comnames[0]=niit
+comnames[1]=sun
+comnames[2]=ms
+comnames[3]=oracle
+#扩展变量定义
+a=1
+b=2
+sum=$[$a+$b]
+echo $sum
+#读取用户的录入
+1）传递参数
+·echo"请输入传递参数";
+·echo"第一个参数:$1";
+·echo"第一个参数:$2";
+...
+·echo"第一个参数:$n";
+./niit.sh 1 2 3
+1 2 3相当于下面数组中传递的参数
+public static void main(String args[]){}
+2）用户录入
+read -p "1st:"x
+read -p "2rd:"y
+sum=$[$x+$y]
+实现四则运算
+#!/bin/bash
+read -p "第一个参数:" x
+read -p "第二个参数:" y
+sum=$[$x+$y]
+echo "第一个数加第二个数等于$sum"
+cha=$[$x-$y]
+echo "第一个数减第二个数等于$cha"
+cheng=$[$x*$y]
+echo "两数相乘得$cheng"
+shang=$[$x/$y]
+echo "第一个数除以第二个数得$shang"
+
+sub=`expr $x-$y`
+
+日期扩展
+#!/bin/bash
+datenow=`date`
+echo "现在是北京时间:$datenow"
+echo "洒家要小憩5秒钟!"
+sleep 5
+dateafter=`date`
+echo "懒虫起床啊!都$dateafter"
+
+
+shell控制流
+1-逻辑判断
+1）if-else
+if语法
+if	判断;  then
+  语句1
+elif	判断;  then
+  语句2
+else
+  语句3
+fi
+-------例子1-------
+#!/bin/bash
+a=10
+b=20
+if (($a!=$b)); then #必须是两个括号
+echo "less"
+fi
+-------例子2--------
+#!/bin/bash
+read -p "输入成绩" s
+if (($s<60)); then
+echo "不及格"
+elif (($s>60)) && (($s<85)); then
+echo "good"
+else
+echo "very good!"
+fi
+--------例子3--------
+#!/bin/bash
+a=10
+if [ $a -lt 20 ]; then  #注意[]里面的前后空格
+echo "less than"
+fi
+----判断根目录下test3是否存在-----
+if [ -d /test3/ ]; then
+echo
+fi
+----------------------------------
+作业:将root下的第一级目录全部拷贝到test3中
+
+2-循环语句
+1）for循环
+------------------------------
+for  变量名  in  循环条件;   do
+语句
+done
+------------例子1--------------
+for i in `seq 1 10`; do  #代表1-10的序列,是条命令所以用`
+echo "$i"
+done
+--
+#!/bin/bash
+for i in $(seq 1 10); do
+echo "$i"
+done
+------------例子2--------------
+#!/bin/bash
+for ((i=1;i<10;i++)); do
+echo "$i"
+done
+-------------------------------
+1-10之间的偶数列
+
+2）while循环
+------------------------------
+while  条件; do
+语句
+done
+-------------例子1------------
+a=10
+while [ $a -ge 1 ]; do
+echo $a
+a=$[$a-1] #a=`expr$a-1`
+done
+------------死循环-------------
+while :; do  #死循环
+echo
+sleep 180
+done
+什么情况下会死循环
+1）监控
+跳出循环
+1）break:跳出所有的循环
+--------让用户输入数字必须大于5-------
+#!/bin/bash
+while :; do
+read -p "请输入一个数:" a
+case $a in 1|2|3|4|5)
+echo "你输入了:$a"
+ ;;
+*) echo "你输入有误"
+break
+ ;;
+esac
+done
+·注意case的语法、 *)相当于java的default
+----------------------------------------
+2）continue:跳出当前循环,继续往下执行
+bin/bash
+while :; do
+read -p "请输入一个数:" a
+case $a in 1|2|3|4|5)
+echo "你输入了:$a"
+ ;;
+*) echo "你输入有误"
+continue
+echo "over"
+ ;;
+esac
+done
+·echo "over"不会执行,一只执行
+------------------------------------------
+
+
+作业:1.让用户输入一个数字,计算出1-n之间的和
+2.判断IPV4地址是否合法(127.0.0.1、第一位介于[1,255]、剩余的数字介于[0,255])
+
+
+
+
+-附件-常见问题和解决方案
+A-身份切换
+[luchang@localhost usr]$
+luchang:代表我登录的用户
+localhost:主机
+usr:正在使用的文件夹
+$:命令符
+
+[root@localhost usr]#
+root:超级管理员
+#:root的命令符
+root的密码是安装的用户(luchang)的密码
+
+普通用户luchang和root怎么切换
+现在是luchang身份-->root
+su  然后输入root密码
+现在是root-->luchang
+su luchang 
+
+B-设置contos联网
+安装图形化界面，网络连接默认是断开的
+设置centos自动联网的步骤
+1- 使用root身份进入终端(putty)
+2- cd /进入根目录
+	-- ls -l
+3- cd /etc 进入etc文件夹
+4- cd sysconfig 进入sysconfig文件夹
+5- cd network-scripts 进入此文件夹
+6- ls -l 查看资源列表
+7- vi ifcfg-eno16777736 编辑文本
+8- 此时，ifcfg-eno16777736文本会以只读的方式打开
+9- 输入 i 进入可编辑状态
+10- 将onboot=no改为yes
+11- 按 esc 返回到只读状态
+12- 输入 :wq 按回车保存
+13- 输入shutdown -r now
+14- ip addr 查看已经联网的局域网的ip地址
+
+
+
+
+
+
+
+
+
+·定时命令
+crontab 命令定时执行
+·····································
+·shell函数
+1-语法
+function  函数名(){语句}
+---------例子1-----------
+#!/bin/bash
+function sum() {
+	sum=$[$1+$2]
+	echo $sum
+}
+sum $1 $2
+---调用./fun.sh 2 4------
+-----检验IP是否合法------
+1）用户录入IP
+2）调用checkip()验证,合法返回2,不合法返回1
+	检验IP格式是否为3个数字
+	检验每段的数字是否在1-255之间
+3）输出结果
+#!/bin/bash
+#check方法
+function checkip() {
+	if echo $1 | egrep -q '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$'; then
+		a=`echo $1 | awk -F . '{print $1}'`
+		b=`echo $1 | awk -F . '{print $2}'`
+		c=`echo $1 | awk -F . '{print $3}'`
+		d=`echo $1 | awk -F . '{print $4}'`
+		for n in $a $b $c $d; do
+			if [ $n -ge 255 ] || [ $n -le 0 ]; then
+				echo "IP不合法,字段应该在1-254之间"
+				return 2
+			fi
+		done
+	else
+		echo "您输入的IP地址不合法!例如192.168.1.1"
+		return 1
+	fi
+}
+rs=1
+while [ $rs -gt 0 ]; do
+	read -p "请输入IP:" ip
+	checkip $ip
+	rs=`echo $?` #return的值重新赋给rs
+done
+echo "您的IP合法"
+·····································
+·awk 用来分析文本
+cat /etc/passwd | awk -F ':' '{print $1}' ·输出账户名称
+cat /etc/passwd | awk -F ':' '{print $1 "\t" $4}' ·输出第一列和第4列,制表符隔开
+cat /etc/passwd | awk -F ':' 'BEGIN{print "username,groupid"} {print $1 "\t" $4}
+	END{print "user35,group35"}' ·BEGIN开头加一行,END结尾加一行
+·····································
+·硬盘和文件
+查看磁盘挂载的容量				df
+用合适的单位显示 				df -h
+查看文件或者文件夹的容量 			du /etc/passwd
+合理显示文件的大小 				du -h /etc/passwd
+显示文件夹的使用和容量				du   test3  
+显示文件夹的使用情况和容量并加上总使用量 	du -c test3
+显示文件夹的总使用量 				du -s test3
+显示文件夹下的文件或子文件夹目录详细信息  	ls -l
+合理的显示文件或文件夹的大小 			ls -h -l
+-s 根据文件或文件夹的大小排序 sort
+·····································
+·文件的压缩和打包
+1）压缩格式
+.gz		gzip压缩
+.bz2		bzip2压缩
+.tar		打包(把一个目录下的所有文件打包成一个文件)
+.tar.gz		先打包后,再使用gzip压缩
+.tar.bz2	先打包后,再使用bzip2压缩
+2）gzip压缩(不支持目录压缩)
+gzip a.sh	·将a.sh压缩
+gzip -d a.sh.gz 	·将a.sh.gz解压
+3）bzip2压缩(不支持目录压缩)
+bzip2 a.sh	·将a.sh压缩
+bzip2 -d a.sh.bz2	·将a.sh.bz2解压
+4）tar打包
+语法
+tar	[-zjxtcvfpP] 文件名
+-z	gzip压缩
+-j	bzip2压缩
+-x	解压或者解包
+-t	查看打包后的内容
+-c	打包
+-v	可视化
+
+-f	设置压缩文件名
+-------------------------------
+
+tar -cvf test7.tar test7	·将test7打包为test7.tar
+tar -xvf test7.tar		·解包,原来的文件被覆盖
+tar -czvf test7.tar.gz test7	·打包再压缩
+tar -zxvf test7.tar.gz		·解压再解包
+tar -tf test7.tar.gz		·查看压缩包内的内容
+································
+·安装源码包
+yum(联网下载rpm)
+yum list|head -n 20	·显示源列表中最上面20条的包信息
+yum search vim		·搜索vim	yum list|grep 'vim'
+yum install vim-X11	·安装
+yum remove vim-X11		·删除包
+································
+·服务器监控命令
+1）top性能监控(CPU利用率、内存利用率、PID、内存交换使用大小)
+2）vmstat查看虚拟内存
+3）netstat查看网络状态(Window也可以用)
+································
+·Java安装
+1）检查自己系统中是否已经安装了jdk
+yum list installed | grep java
+2）卸载已经安装的java
+yum -y remove java-1.7.0-openjdk*	·-y意思是默认 确认
+yum -y remove tzdata-java.noarch
+3)下载jdk.tar.gz文件到下载目录
+4）在usr文件夹下创建一个java目录
+mkdir /usr/java
+5）将下载后的压缩包拷贝到/usr/java目录下
+cp /home/luchang/jdk.tar.gz  /usr/java
+6）解压缩
+tar -zxvf jdk.tar.gz
+7）重命名 jdk文件名
+mv jdk1.7.0_67 jdk
+--------JDK安装好了-----------
+8）配置环境
+vi /etc/profile
+9）使得环境变量生效
+source /etc/profile
+10）检验是否安装成功
+java -version
+java
+javac
+································
+·安装Mysql
+1）
+2）解压解包
+su 切换为root用户
+在 /home/luchang/Downloads下执行解压
+tar -xzvf mysql.tar.gz -C /usr/local/mysql ·先用root在该路径下创建mysql
+tar -xzvf mysql.tar.gz -C /usr/local/
+cd /usr/local
+3）
+mv  mysql-5.7.9-linux-glibc2.5-x86_64  mysql·重命名
+4）
+创建用户权限
+useradd -r -M -s /sbin/nologin mysql
+将/usr/local/mysql文件夹的所有者和组都改为mysql
+默认是7161
+chown -R mysql.mysql /usr/local/mysql
+将/usr/local/mysql所属组改为mysql
+chgrp -R mysql /usr/local/mysql
+5）安装和初始化数据库
+cd /usr/local/mysql
+
+bin/mysql_install_db  --user=mysql  --basedir=/usr/local/mysql
+--datadir=/usr/local/mysql/data/
+6）配置
+cp -a ./support-files/my-default.cnf  /etc/my.cnf·把Mysql配置文件放到全局
+cp -a ./support-files/mysql.server  /etc/init.d/mysqld·添加mysqld服务,为了开机自启动
+cd bin/
+./mysqld_safe   --user=mysql & ·从后台启动mysql
+Ctrl+c跳出
+/etc/init.d/mysqld restart ·重启mysqld服务
+ps aux | grep mysql ·查看mysql进程
+chkconfig  --level  35  mysqld  on ·开机自启动mysqld服务
+·····································
+作业:
+重建虚拟机,安装java、mysql
+·····································
+·安装apache
+1）web-服务器
+apache
+nginx：俄国
+IIS：windows比较多
+lighttpd：德国
+Tomcat
+Jetty（爱奇艺）
+Resin
+2）配置
+·1-下载
+·2-修改权限
+	chmod 755 httpd-2.2.31.tar.gz
+·3-配置路径
+./configure --prefix=/usr/local/apache --enable-module=most --enable-shared=max ·编译参数
+·如果上述步骤失败
+·解压缩
+tar -xzvf httpd-2.2.31.tar.gz
+mv httpd-2.2.31 httpd
+·4）配置安装路径
+./configure --prefix=/usr/local/apache --enable-module=most --enable-shared=max ·编译参数
+make ·编译
+make install ·安装
+·5）
+5-启动
+/usr/local/apache/bin/apachectl   start
+启动出现错误：
+cd  /usr/local/apache/conf
+vi    httpd.conf
+修改为：
+“ServerName  localhost:80”
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
