@@ -643,6 +643,43 @@ Integer使用了对象缓存机制，默认范围是 -128~127，推荐使用静�
 
 2、jps定位查看堆栈信息
 
-- jps -l
-- 使用进程号获取 jstack 11444 （进程号）
+- 命令行进入代码目录
+
+- 输入命令查看进程号：jps -l
+- 使用进程号获取堆栈信息： jstack 11444 （进程号）
+
+```java
+public class DeadLock {
+    public static void main(String[] args) {
+        String lockA = "lockA";
+        String lockB = "lockB";
+        new Thread(new MyLock(lockA, lockB), "T1").start();
+        new Thread(new MyLock(lockB, lockA), "T2").start();
+    }
+    static class MyLock implements Runnable {
+        private final String lockA;
+        private final String lockB;
+        public MyLock(String lockA, String lockB) {
+            this.lockA = lockA;
+            this.lockB = lockB;
+        }
+        @Override
+        public void run() {
+            synchronized (lockA) {
+                System.err.println(Thread.currentThread().getName() + "获取到锁" + lockA);
+                //休息2秒,保证两个线程都能获取到各自的锁
+                try {
+                    TimeUnit.SECONDS.sleep(2);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                System.err.println(Thread.currentThread().getName() + "尝试获取锁" + lockB);
+                synchronized (lockB) {
+                    System.err.println(Thread.currentThread().getName() + "尝试获取锁" + lockB);
+                }
+            }
+        }
+    }
+}
+```
 
