@@ -5,6 +5,7 @@
   b.属性过多，创建配置类 @ConfigurationProperties(prefix="test")
   c.自定义配置文件，在resource下创建test.properties
     创建配置类 @Configuration @PropertySource("classpath:test.properties") @ConfigurationProperties(prefix="test") @Component
+
   > b和c要在启动类加 @EnableConfigurationProperties({配置类.class})
   > 属性间相互引用 test.title=${test.name}--${test.age}
 3.通过命令设置属性值 
@@ -122,3 +123,149 @@ ConfigClassPrase 处理@Configuration、@Component、@ComponentScan等注解
 CommonBeanPostProcessor处理@PostContructor、@PreDestory
 
 动态代理类，是在bean实例化后，执行beanPostProcessor的after的时候生成的 AbstractAutoProxyCreator
+
+
+
+
+
+**##** **SpringBoot**
+
+1、为什么选择springboot？？
+
+​	因为能让我们快速的开发spring项目
+
+2、为什么能快速的构建spring项目
+
+​	使用约定优于配置的方式省去了繁琐的配置从而快速的构建spring 项目
+
+​	开发规范 可以不遵守。只是一种约定，能让后续的开发和维护变得方便
+
+3、举个例子（体现约定优于配置）
+
+​	》默认的application.yml
+
+​	》spring-boot-starter-web,默认集成tomcat，默认会在resource/ ，template、static
+
+​	》spring启动时候扫描META-INF/spring-factories
+
+4、为什么做简化？
+
+​	（applicationContext.xml配置文件一定需要——IOC、DI）而大部分描述的是应用内部的bean
+
+​	bean的维护问题：如果配置文件非常多怎么办？
+
+5、springboot依赖于 spring Framework、如果是web应用还依赖于spring mvc
+
+​	spring mvc依赖servlet
+
+​	webflux 是netty自己实现的一个事件响应框架
+
+6、springboot有哪些真正意义的创新
+
+​	Spring Boot Starter开箱即用的组件
+
+​	EnableAutoConfiguration自动装配
+
+​	Actuator应用监控
+
+​	Spring Boot CLI命令行工具 ，基于groovy脚本快速运行spring boot
+
+7、spring boot要解决的痛点，因何而生？？？
+
+bean 的管理问题：有多个applicationContext.xml配置文件，有很多bean配置，维护特别困难
+
+
+
+\-----------------------------------------------------------------------------------
+
+**##** **spring**注解驱动的发展历史
+
+spring1.x
+
+​	bean管理问题
+
+​	@Transaction
+
+spring2.x（2.5时代，注解并没有发挥价值，很多团队没有采用注解，依然选择xml）
+
+​	bean管理问题:大部分描述的是应用内部的bean
+
+​	@Repository dao层
+
+​	@Component 组件层
+
+​	@Service 服务层
+
+​	@RequestMapping
+
+​	@Qualifier 给bean加了个标记
+
+
+
+总结：仍然在解决bean 的装载问题（注入）
+
+问题：为什么没有完全脱离xml？？？
+
+​	context:commponent-scan 这种注解还是存在（开启包扫描）
+
+spring3.x时代
+
+​	@Configuration -> JavaConfig -> 通过注解方式配置bean
+
+​	@ComponentScan
+
+​	@Import 导入一个配置
+
+​	@ImportResource 导入一个资源文件（可以是xml文件，import导入的是一个 类）
+
+xml完全被注解取代，spring进入无配置化时代，还是在解决bean的装载问题
+
+​	@Enable 模块驱动，完成bean的自动装配
+
+​		>>@EnableScheduling 完成了和@Scheduling注解解析相关的bean的注入
+
+​		>>完成某个固定功能 的bean的自动装载
+
+
+
+spring4.x时代 （决定了哪些类可以被装载）
+
+​	@Conditional 注解 -> 条件装配，需要自定义一个类实现Condition接口，并重写方法
+
+在装载一个bean 的时候，需要判断上下文信息，如果存在某个bean，才要做装载 
+
+
+
+spring5.x时代 -->基于注解的优化，不再是bean的装载
+
+​	@Index spring启动过程中需要装载很多bean，引入该注解进行优化
+
+
+
+\-----------------------------------------------------------------------------------
+
+spring注解驱动往spring boot发展
+
+
+
+Springboot时代
+
+不再 需要关心bean的配置！
+
+bean要不要装载，什么时候装载？
+
+SPI：SpringFactoriesLoader（读取spring-factories）
+
+![image-20210225191401280](/Users/luchang/Library/Application Support/typora-user-images/image-20210225191401280.png)
+
+Spring动态装载bean 的方式：ImportSelector接口、Registration接口
+
+------------------------------------作业---------------------------------------
+
+@EnableAutoConfiguration+Starter
+
+自动转配+约定优于组件=开箱即用的组件（starter）
+
+SpringFactoriesLoader SPI机制
+
+SpringFactoriesLoader.loadFactoryByName()   
