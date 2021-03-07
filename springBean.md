@@ -120,3 +120,4 @@ public class BeanFactory{
 
 ![image-20210125143549642](/Users/luchang/Library/Application Support/typora-user-images/image-20210125143549642.png)
 
+ 
