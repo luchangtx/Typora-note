@@ -292,3 +292,110 @@ springcloud升级后的坑
 
  
 
+## Gateway
+
+> 核心逻辑：路由转发+执行过滤链
+
+路由、断言、过滤
+
+![image-20210308171226564](/Users/luchang/Library/Application Support/typora-user-images/image-20210308171226564.png)
+
+> Predicate
+
+![image-20210308172333293](/Users/luchang/Library/Application Support/typora-user-images/image-20210308172333293.png)
+
+> Gateway 中的过滤器
+
+一般不用提供的 经典的过滤器，一般自己写自定义的过滤器
+
+![image-20210308173256719](/Users/luchang/Library/Application Support/typora-user-images/image-20210308173256719.png)
+
+## springcloud-config
+
+>服务端
+
+```yaml
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      # 读取git中的配置文件
+      server:
+        git:
+          username: lizelong
+          password: sundear12345678..@
+          uri: http://git.sundear.com:808/lm-ad/sundear-properties.git
+          search-paths: dev
+```
+
+> 客户端
+
+```yaml
+# 会从配置中心读取 ${spring.application.name}-dev.yml的配置
+cloud:
+  config:
+    discovery:
+      enabled: true
+      service-id: config-server
+    fail-fast: true
+    label: master
+    name: ${spring.application.name}
+    profile: dev
+    username: luomaConfigUser
+    password: luomaConfigUser..@
+```
+
+> 手动刷新配置，不需重启config客户端
+
+引入actuator 监控依赖，在yml中增加 端点暴露配置
+
+```yaml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+```
+
+在主启动类增加@RefreshScope 注解启动刷新功能
+
+`客户端执行` curl -X POST "http://localhost:3355/actuator/refresh"
+
+执行请求进行手动刷新
+
+> 动态刷新
+
+`springcloud bus` 目前仅支持 `rabbitmq`和`kafka`
+
+ 服务端、客户端增加消息总线的依赖
+
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-bus</artifactId>
+</dependency>
+<dependency>
+		<groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+</dependency>
+<!--或者-->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-bus-amqp</artifactId>
+</dependency>
+```
+
+`服务端执行`curl -X POST "http://localhost:3344/actuator/bus-refresh"
+
+> 刷新定点通知
+
+服务端口执行：curl -X POST "http://localhost:3344/actuator/bus-refresh/{serverName}:3355"
+
+## Springcloud Stream
+
+> 消息驱动
+
