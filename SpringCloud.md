@@ -399,3 +399,71 @@ management:
 
 > 消息驱动
 
+消息提供者：定义消息的推送管道
+
+```java
+//自定义接口，增加一个send方法
+//实现类增加如下
+@EnableBinding(Source.class)
+//注入
+@Autowired
+private MessageChannel output;
+//重写方法,方法体内容
+String message="消息内容，可以是其他格式";
+output.send(MessageBuilder.withPayload(message).build);
+return null;
+```
+
+消息消费者：
+
+```java
+@Component
+@EnableBinding(Sink.class)
+//自定义方法如下
+@StreamListener
+public void input(Message<String> message){
+  //获取消息
+  message.getpayload();
+}
+```
+
+```yaml
+spring:
+  cloud:
+    stream:
+      binders:
+       defaultRabbit: #表示定义的名称，用于bingding的整合
+         type: rabbit
+         environment:
+           spring:
+             rabbitmq:
+               host:
+               port:
+               username:
+               password:
+      bindings:
+        output: #生产者写output，消费者写input
+          destination: studyExchange #表示自定义的消息 交换机（rabbitmq），kafaka对应Topic
+          content-type: application/json
+          binder: defaultRabbit #设置上述设置的消息服务
+          group: groupA #设置分组可以解决重复消费的问题，以及持久化
+```
+
+## Nacos
+
+dynamic Naming configuration service
+
+derby内置数据库
+
+> 命名空间、分组、dataId
+
+> 连接mysql进行持久化，修改配置
+
+> 集群配置，修改集群配置文件
+>
+> 使用启动脚本+prot参数进行启动
+
+## Sentinel
+
+![image-20210310173734589](/Users/luchang/Library/Application Support/typora-user-images/image-20210310173734589.png)
+
