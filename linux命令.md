@@ -53,3 +53,22 @@ netstat -napt
 lsof -i:8080
 ```
 
+
+
+## 内存占用
+
+```bash
+# 查看内存占用情况
+free -mth
+#如果buff/cache占用内存较多，清楚缓存即可
+#查看缓存情况
+cat /proc/sys/vm/drop_caches
+#上述命令结果可能是0
+#表示清除pagecache。
+echo 1 > /proc/sys/vm/drop_caches 
+#表示清除回收slab分配器中的对象（包括目录项缓存和inode缓存）。slab分配器是内核中管理内存的一种机制，其中很多缓存数据实现都是用的pagecache。
+echo 2 > /proc/sys/vm/drop_caches 
+#表示清除pagecache和slab分配器中的缓存对象。
+echo 3 > /proc/sys/vm/drop_caches 
+```
+

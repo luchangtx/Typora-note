@@ -457,13 +457,278 @@ derby内置数据库
 
 > 命名空间、分组、dataId
 
-> 连接mysql进行持久化，修改配置
+>集群配置，分三个步骤
 
-> 集群配置，修改集群配置文件
->
-> 使用启动脚本+prot参数进行启动
+`第一步`
+
+- 安装mysql，因为集群需要基于mysql进行持久化迁移
+
+- 进入nacos conf目录，修改配置前先进性备份
+
+- 修改application.properties，增加如下配置
+
+- ```properties
+  ############mysql数据库配置###############
+  spring.datasource.platform=mysql
+  db.num=1
+  db.url.0=jdbc:mysql://172.16.196.236:3306/nacos_config?characterEncoding=utf8&connectTimeout=1000&socketTimeout=3000&autoReconnect=true&useUnicode=true&useSSL=false&serverTimezone=UTC
+  db.user=root
+  db.password=123456
+  ```
+
+`第二步`
+
+- 修改集群配置文件cluster.conf
+
+- ```bash
+  hostname -i #查看服务器识别的hostname
+  ```
+
+- 增加三个节点的 host:port配置如下
+
+  - ```bash
+    172.16.196.236:3333
+    172.16.196.236:4444
+    172.16.196.236:5555
+    ```
+
+`第三步`
+
+- 修改启动脚本 startup.sh
+
+- ```bash
+  # 增加端口变量 t
+  while getopts ":m:f:s:c:p:t:" opt
+  do
+      case $opt in
+          m)
+              MODE=$OPTARG;;
+          f)
+              FUNCTION_MODE=$OPTARG;;
+          s)
+              SERVER=$OPTARG;;
+          c)
+              MEMBER_LIST=$OPTARG;;
+          p)
+              EMBEDDED_STORAGE=$OPTARG;;
+          t)
+              PORT=$OPTARG;;
+          ?)
+          echo "Unknown parameter"
+          exit 1;;
+      esac
+  done
+  #在最后启动脚本增加参数
+  nohup $JAVA -Dserver.port=${PORT} ${JAVA_OPT} nacos.nacos >> ${BASE_DIR}/logs/start.out 2>&1 &
+  ```
+
+- 然后使用脚本+端口号启动
+
+  - ```bash
+    ./startup.sh -t 3333
+    ```
+
+如果非集群启动，启动时需增加参数
+
+```bash
+./startup.sh -m standalone
+```
+
+
 
 ## Sentinel
 
 ![image-20210310173734589](/Users/luchang/Library/Application Support/typora-user-images/image-20210310173734589.png)
 
+### 流控规则
+
+阈值设置分2种
+
+- QPS
+- 线程数
+
+QPS+线程数：流控模式
+
+- 直接
+- 关联
+- 链路
+
+QPS 流控效果
+
+- 快速失败
+- warm up 预热
+- 排队等待
+
+`流控效果为快速失败`
+
+> QPS - 直接 - 快速失败 报错是默认的错误信息，后续会增加自定义的处理
+>
+> 线程数 - 直接 - 快速失败 
+>
+> QPS - 关联 -快速失败 A关联B，B请求超过阈值，A挂掉（支付模块和订单模块）
+
+`流控效果为预热`
+
+冷加载因子 coldFactor默认是3，即请求的QPS从 阈值/3 开始，经过预热时长 逐渐升至设定的QPS阈值
+
+> QPS 阈值设为10 ，流控模式  直接，流控效果 warmup，预热时长5s
+>
+> 意思是 初始 阈值将从 10/3 =3 开始，每秒3次访问，超过直接失败，5s之后，慢慢恢复为每秒10次访问
+
+`流控效果为排队等待`
+
+漏桶算法，让请求匀速通过，只允许 阈值 范文内的请求同时进来超过的进行匀速排队通过
+
+### 降级规则
+
+#### RT慢调用比例
+
+RT平均响应时间 > 阈值，触发 断路器打开，进行服务降级，窗口期结束，在关闭断路器恢复 
+
+#### 异常比例
+
+QPS>=5 并且异常比例超出阈值，才会进行降级熔断保护
+
+#### 异常数
+
+按分钟统计，异常数大于阈值，进行降级熔断保护
+
+### 热点规则
+
+某一时刻，某个热点的key大流量访问，比如 `新冠肺炎`在某一时刻大流量访问，我们需要对其进行热点key防护
+
+> 仅支持QPS模式，参数索引，即get请求参数的位置
+
+```java
+@GetMapping("hotkey")
+//参数自定义,名称唯一即可
+@SentinelResource(value = "hotkey", blockHandler = "dealHotKey")
+public String hotkey(@RequestParam("p1") String p1, @RequestParam("p2") String p2) {
+	return "-------hotkey";
+}
+public String dealHotKey(String p1, String p2, BlockException exception) {
+	return "sorry,wait hotkey";
+}
+```
+
+自定义fallback 从 HystrixCommand到SentinelResource
+
+`上述热点配置如果配的是参数索引是0，阈值是1，那请求参数中只要带p1，并且超出阈值就会降级，但是如果请求参数没有p1只有p2，则不会降级`
+
+旧版本可能还存在参数例外项
+
+意思是 索引是配置的位置，但是值是具体的某个值时设置例外的阈值
+
+`仅处理规则配置的错误，代码里的异常不做降级保护`
+
+### 系统规则
+
+针对整个参与监控的微服务都有效
+
+### @SentinelResource
+
+客户自定义限流，临时规则 持久化以及与业务代码解耦
+
+自定义类CustomerBlockHandler，写多个兜底方法，在SentinelResource注解中指定类和方法名
+
+## Sentinel整合Ribbon+openfeign+fallback
+
+> @SentinelResource
+>
+> 仅配置blockhandler，如果规则不是异常，则java运行异常不做降级保护
+>
+> 仅配置fallback，异常也会走fallback
+>
+> 如果两个都配置，会以blockhandler的规则为准
+
+## Sentinel 规则配置持久化
+
+结合nacos
+
+```yaml
+spring:
+  application:
+    name: provider9001
+  cloud:
+    nacos:
+      discovery:
+        username: nacos
+        password: nacos
+        server-addr: 101.133.164.156:3333 # nacos的地址
+    sentinel:
+      transport:
+        dashboard: localhost:8080 #配置sentinel dashboard 地址
+        port: 8719 #服务端口,默认是8719,如果被占用,会+1尝试
+        clientIp: 192.168.0.136 #需要制定sentinel所在服务器的ip,否则会报连接超时
+      datasource:
+        ds1:
+          nacos:
+            server-addr: 101.133.164.156:3333
+            dataId: ${spring.application.name}
+            groupId: DEFAULT_GROUP
+            data-type: json
+            rule-type: flow
+```
+
+服务关掉之后，限流规则消失？？？
+
+只有重启之后再调用相关接口，才会再次出现
+
+那关掉之后响应的限流降级保护 岂不是没有了
+
+## 分布式事务 seata
+
+一个ID，三个组件
+
+> TC 维护全局和分支事务的状态，驱动全局事务回滚或提交
+>
+> TM 定义全局事务的范围，开始、提交、回滚全局事务
+>
+> RM 管理分支事务处理的资源，与TC交谈以注册分支事务和报告分支事务的状态，并驱动分支事务的提交或回滚
+
+提供了四种事务模式
+
+默认是AT，分两阶段
+
+第一阶段：各个事务参与方，在执行业务sql前，进行 before image 前置镜像处理，然后执行完之后再进行after image后置镜像处理，然后生成行锁
+
+第二阶段提交：如果顺利，业务sql在第一阶段`已传至数据库`所以seata只需将一阶段保存的before 和after image及行锁删掉，完成数据清理即可提交
+
+第二阶段回滚：利用之前的before image进行业务数据还原，但是之前要进行对比，防止脏写，对比当前数据库数据和after image，如果一致进行还原，不一致则说明已经有人操作了出现了脏写，需要转为人工处理（因为第一阶段执行完业务sql 加了行锁，所以其他线程进来是要阻塞等待）
+
+> AT 写隔离
+
+现有两个全局事务，tx1和tx2分别 操作a表，
+
+现在tx1先开启本地事务，记录当前 镜像 before image
+
+```mysql
+select num from a where id=1;
+```
+
+然后执行业务sql
+
+```mysql
+update a set num=1 where id=1;
+```
+
+生成after image
+
+```mysql
+select num from a where id=1;
+```
+
+准备提交本地事务，在此之前要先获得全局锁，本地事务提交后释放本地锁
+
+tx2 开启本地事务，拿到本地锁，经过before image、执行业务sql、after image 等操作，提交本地前尝试获取全局锁，但全局所tx1持有，进入等待
+
+会有两种情况
+
+- tx1 提交成功，释放全局锁，tx2获取全局锁提交本地事务
+- tx1 全局回滚，需要获取本地所，进行反向补偿，但此时本地锁tx2持有，则tx1会回滚失败，并且一直尝试，直到tx2全局锁等待超时，释放全局锁并回滚本地事务释放本地锁，tx1才可以获取本地所进行事务回滚。
+
+上述过程中tx1在结束之前一直持有全局锁，所以不会发生脏写
+
+> AT读隔离
+
+在数据库本地事务隔离级别是读已提交或以上的基础上，AT模式的全局事务隔离级别是读未提交，如果特定场景，需要全局事务是读已提交，目前seata的实现方式是通过 select for update 语句代理。
